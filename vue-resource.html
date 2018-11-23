@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+  <script src="./node_modules/vue/dist/vue.js" ></script>
+  <script src="./node_modules/vue-resource/dist/vue-resource.js" ></script>
+</head>
+<body>
+  <div id="app" class="container">
+    <h1>vue-resource 插件的使用</h1>
+    <a href="javascript:;" class="btn btn-primary" @click="get">get 请求</a>
+    <a href="javascript:;" class="btn btn-primary" @click="post">post 请求</a>
+    <a href="javascript:;" class="btn btn-primary" @click="jsonp">jsonp 请求</a>
+    <a href="javascript:;" class="btn btn-primary" @click="http">http 请求</a>
+    <!-- 此处a链接的 href 属性 防止页面刷新 跳转 -->
+    <div><span>{{ msg }}</span></div>
+  </div>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        msg: ''
+      },
+      /*
+      * 配置全局拦截器
+      * */
+      mounted: function(){
+        Vue.http.interceptors.push(function (request, next) {
+          // 请求前
+          console.log('request init')
+          // 请求后
+          next(function (response) {
+            console.log('response init')
+            return response
+          })
+        })
+      },
+      /*
+      * 配置全局地址
+      * */
+      http: {
+        root: 'http://localhost:63342/vue.js/01/test/'
+      },
+      methods: {
+        get(){
+          /*
+          *  Vue-resource 已经自动挂载到 vue 实例上
+          *     所以我们可以 通过 this.$http 来调用
+          *      url 如果 没有 http root 的 设置
+          *      会从当前 html 的路径下寻找
+          * */
+          this.$http.get('package.json',{
+            params: {
+              userId: '101'
+            },
+            headers: {
+              token: 'abcd'
+            }
+          }).then(res => {
+            this.msg = res.data;
+          }, err => {
+            this.msg = err
+          })
+        },
+        post(){
+          // 第二个参数 req.body 第三个参数 option
+          this.$http.post('package.json', {
+            userId: '102'
+          }, {
+            headers: {
+              access_token: 'abc'
+            }
+          }).then(res => {
+            this.msg = res.data;
+          })
+        },
+        jsonp(){
+          this.$http.jsonp('https://www.baidu.com/img/baidu_85beaf5496f291521eb75ba38eacbd87.svg').then(
+            this.msg = res.data
+          )
+        },
+        http(){
+          this.$http({
+            url: 'package.json',
+            params: {
+              userId: '104'
+            },
+            headers: {
+              token: '123'
+            },
+            timeout: 5,
+            // 请求之前执行的函数
+            before: function () {
+              console.log('before init')
+            }
+          }).then(res => {
+            this.msg = res.data
+          })
+        }
+      }
+    })
+  </script>
+</body>
+</html>

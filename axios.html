@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.css">
+  <script src="./node_modules/vue/dist/vue.js" ></script>
+  <script src="./node_modules/axios/dist/axios.js" ></script>
+</head>
+<body>
+<div id="app" class="container">
+  <h1>axios 插件的使用</h1>
+  <a href="javascript:;" class="btn btn-primary" @click="get">get 请求</a>
+  <a href="javascript:;" class="btn btn-primary" @click="">post 请求</a>
+  <!-- 不要写未定义的函数名 挂在上面 否则请求的数据 渲染不出来
+   -->
+  <!-- 此处a链接的 href 属性 防止页面刷新 跳转 -->
+  <div><span>{{ msg }}</span></div>
+</div>
+<script>
+  new Vue({
+    el: '#app',
+    data: {
+      msg: ''
+    },
+    methods: {
+      get(){
+        axios.get('package.json',{
+          params: {
+            userId: '999'
+          },
+          headers: {
+            token: 'jack'
+          },
+          before: () => {
+            console.log('before init')
+          }
+        }).then(res => {
+          this.msg = res.data;
+        }).catch(err => {
+          console.log(err)
+        })
+      },
+      post(){}
+    }
+  })
+</script>
+</body>
+</html>
